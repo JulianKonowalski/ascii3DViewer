@@ -1,76 +1,146 @@
-#include <cmath>
+#include "Vec2.h"
+#include "Triangle2D.h"
+#include "Triangle3D.h"
+
 #include <iostream>
 #include <thread>
 
-const int screenWidth = 70;
-const int screenHeight = 50;
-const int screenSize = screenWidth * screenHeight;
+const int WIDTH = 100, HEIGHT = 50;
+const int SCREEN_SIZE = WIDTH * HEIGHT;
+const int FOV_ANGLE = 45;
 
-const float thetaSpacing = 0.07f;
-const float phiSpacing = 0.02f;
+Vec3 rotate(Vec3 point, Vec3 rotation) {
+	double yaw = rotation.z() / 180.0 * 3.1415;
+	double pitch = rotation.y() / 180.0 * 3.1415;
+	double roll = rotation.x() / 180.0 * 3.1415;
 
-const float R1 = 0.5f;
-const float R2 = 1.0f;
-const float K2 = 60.0f;
-const float K1 = screenWidth * K2 * 3.0 / (8.0 * (R1 + R2));
+	double xRotated =
+		std::cos(yaw) * std::cos(pitch) * point.x() +
+		(std::cos(yaw) * std::sin(pitch) * std::sin(roll) - std::sin(yaw) * std::cos(roll)) * point.y() +
+		(std::cos(yaw) * std::sin(pitch) * std::cos(roll) + std::sin(yaw) * std::sin(roll)) * point.z();
 
-int main(void) {
-	float A = 0;
-	float B = 0;
+	double yRotated =
+		std::sin(yaw) * std::cos(pitch) * point.x() +
+		(std::sin(yaw) * std::sin(pitch) * std::sin(roll) + std::cos(yaw) * std::cos(roll)) * point.y() +
+		(std::sin(yaw) * std::sin(pitch) * std::cos(roll) - std::cos(yaw) * std::sin(roll)) * point.z();
 
-	char frameBuffer[screenSize];
-	char zBuffer[screenSize];
+	double zRotated =
+		std::sin(pitch) * point.x() * -1.0 +
+		std::cos(pitch) * std::sin(roll) * point.y() +
+		std::cos(pitch) * std::cos(roll) * point.z();
 
+	return Vec3(xRotated, yRotated, zRotated);
+}
 
-	while (true) {
-		
-		//clear buffers
-		memset(frameBuffer, ' ', screenSize);
-		memset(zBuffer, 0, screenSize);
+Vec3 translate(Vec3 point, Vec3 offset) {
+	return Vec3(point.x() + offset.x(), point.y() + offset.y(), point.z() + offset.z());
+}
 
-		float sinA = sin(A), cosA = cos(A);
-		float sinB = sin(B), cosB = cos(B);
+Vec3 project(Vec3 vector, int FOV) {
+	double angleRadians = (FOV / 180.0) * 3.1415;
+	double xProjected = vector.x();
+	double yProjected = vector.y();
+	if (vector.z() != 0.0) {
+		double scalingFactor = vector.z() * std::tan(angleRadians / 2);
+		xProjected /= scalingFactor;
+		yProjected /= scalingFactor;
+	}
+	return Vec3(xProjected, yProjected, vector.z()); //z is passed as depth information
+}
 
-		for (float theta = 0; theta < 2 * 3.1415; theta += thetaSpacing) {
-			float cosTheta = cos(theta), sinTheta = sin(theta);
+Vec2 toConsoleCoordinates(Vec3 coord, int width, int height) {
+	return Vec2(
+		(coord.x() + 1) / 2 * (WIDTH - 1),
+		((-1 * coord.y()) + 1) / 2 * (HEIGHT - 1)
+	);
+}
 
-			for (float phi = 0; phi < 2 * 3.1415; phi += phiSpacing) {
-				float cosPhi = cos(phi), sinPhi = sin(phi);
+Triangle3D createTriangle3D(void) {
+	Vec3 vertices[3] = {
+		Vec3(0.0, 1.0, 0.0),
+		Vec3(-1.0, -1.0, 0.0),
+		Vec3(1.0, -1.0, 0.0)
+	};
+	return Triangle3D(vertices);
+}
 
-				//construct the torus
-				float circleX = R2 + R1 * cosTheta;
-				float circleY = R1 * sinTheta;
+void rasteriseLine(Vec2 lineStart, Vec2 lineEnd, char* buffer) {
+	//todo
+}
 
-				//get world space 3D coordinates
-				float x = circleX * (cosB * cosPhi + sinA * sinB * sinPhi) - circleY * cosA * sinB;
-				float y = circleX * (sinB * cosPhi - sinA * cosB * sinPhi) + circleY * cosA * sinB;
-				float z = K2 + cosA * circleX * sinPhi + circleY * sinA;
-				float ooz = 1 / z;
+void fillTriangle(const Vec2& v1, const Vec2& v2, const Vec2& v3, char* buffer) {
+	double y1 = v1.y();
+	double y2 = v2.y();
+	double y3 = v3.y();
 
-				//projection to screen space 2D coordinates
-				int xProjected = (int)(screenWidth / 2 + K1 * ooz * x);
-				int yProjected = (int)(screenHeight / 2 - K1 * ooz * y);
+	double x1 = v1.x();
+	double x2 = v2.x();
+	double x3 = v3.x();
 
-				//ligthing
-				float luminance = cosPhi * cosTheta * sinB - cosA * cosTheta * sinPhi - sinA * sinTheta + cosB * (cosA * sinTheta - cosTheta * sinA * sinPhi);
-				int index = xProjected + yProjected * screenWidth;
-				if (luminance > 0 && ooz > zBuffer[index]) {
-					zBuffer[index] = ooz;
-					int luminanceIndex = luminance * 8;
-					frameBuffer[index] = ".,-~:;=!*#$@"[luminanceIndex];
-				}
+	int xMin = (int)std::min(std::min(x1, x2), x3);
+	int xMax = (int)std::max(std::max(x1, x2), x3);
+	int yMin = (int)std::min(std::min(y1, y2), y3);
+	int yMax = (int)std::max(std::max(y1, y2), y3);
+
+	for (int y = yMin; y <= yMax; y++) {
+		for (int x = xMin; x <= xMax; x++) {
+			if ((x1 - x2) * (y - y1) - (y1 - y2) * (x - x1) >= 0 &&
+				(x2 - x3) * (y - y2) - (y2 - y3) * (x - x2) >= 0 &&
+				(x3 - x1) * (y - y3) - (y3 - y1) * (x - x3) >= 0) {
+				buffer[x + y * WIDTH] = '.';
 			}
 		}
+	}
+}
 
-		for (int i = 0; i < screenSize; ++i) { //drawing
-			putchar(i % screenWidth ? frameBuffer[i] : '\n');
+int main(void) {
+
+	char buffer[SCREEN_SIZE];
+	std::string bufferString;
+
+	Triangle3D triangle3d = createTriangle3D();
+
+	Vec3 rotationVector(0.0, 2.0, 1.0);
+	Vec3 translationVector(0.0, 0.0, 5.0);
+
+	while (true) {
+		memset(buffer, ' ', SCREEN_SIZE);
+	
+		triangle3d.setP1(rotate(triangle3d.p1(), rotationVector));
+		triangle3d.setP2(rotate(triangle3d.p2(), rotationVector));
+		triangle3d.setP3(rotate(triangle3d.p3(), rotationVector));
+
+		Vec3 p1 = project(translate(triangle3d.p1(), translationVector), FOV_ANGLE);
+		Vec3 p2 = project(translate(triangle3d.p2(), translationVector), FOV_ANGLE);
+		Vec3 p3 = project(translate(triangle3d.p3(), translationVector), FOV_ANGLE);
+
+		Vec2 p1Console = toConsoleCoordinates(p1, WIDTH, HEIGHT);
+		Vec2 p2Console = toConsoleCoordinates(p2, WIDTH, HEIGHT);
+		Vec2 p3Console = toConsoleCoordinates(p3, WIDTH, HEIGHT);
+
+		fillTriangle(p1Console, p2Console, p3Console, buffer);
+
+		//rasteriseLine(p1Console, p2Console, buffer);
+		//rasteriseLine(p2Console, p3Console, buffer);
+		//rasteriseLine(p3Console, p1Console, buffer);
+
+		//rasteriseLine(Vec2(10.0, 10.0), Vec2(30.0, 10.0), buffer);
+
+		buffer[(int)p1Console.x() + (int)p1Console.y() * WIDTH] = '*';
+		buffer[(int)p2Console.x() + (int)p2Console.y() * WIDTH] = '*';
+		buffer[(int)p3Console.x() + (int)p3Console.y() * WIDTH] = '*';
+
+		for (int i = 0; i < SCREEN_SIZE; ++i) {
+			if (i != 0 && !(i % WIDTH)) { bufferString += "\n"; }
+			bufferString += buffer[i];
 		}
 
-		A += 0.04;
-		B += 0.02;
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 		system("cls");
+		std::cout << bufferString;
+		bufferString.clear();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 
+	return 0;
 }
