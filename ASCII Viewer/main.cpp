@@ -5,7 +5,7 @@
 #include <iostream>
 #include <thread>
 
-const int WIDTH = 100, HEIGHT = 50;
+const int WIDTH = 150, HEIGHT = 75;
 const int SCREEN_SIZE = WIDTH * HEIGHT;
 const int FOV_ANGLE = 45;
 
@@ -64,8 +64,86 @@ Triangle3D createTriangle3D(void) {
 	return Triangle3D(vertices);
 }
 
-void rasteriseLine(Vec2 lineStart, Vec2 lineEnd, char* buffer) {
-	//todo
+void drawLineHorizontal(const Vec2& lineStart, const Vec2& lineEnd, char* buffer) {
+	int x0 = (int)lineStart.x();
+	int x1 = (int)lineEnd.x();
+	int y0 = (int)lineStart.y();
+	int y1 = (int)lineEnd.y();
+
+	if (x0 > x1) {
+		int tmp = x0;
+		x0 = x1;
+		x1 = tmp;
+
+		tmp = y0;
+		y0 = y1;
+		y1 = tmp;
+	}
+
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+
+	int dir = dy < 0 ? -1 : 1;
+	dy *= dir;
+
+	if (dx == 0) { return; }
+
+	int y = y0;
+	int D = 2 * dy - dx;
+
+	for (int i = 0; i < dx + 1; ++i) {
+		buffer[x0 + i + y * WIDTH] = '*';
+		if (D >= 0) {
+			y += dir;
+			D -= 2 * dx;
+		}
+		D += 2 * dy;
+	}
+}
+
+void drawLineVertical(const Vec2& lineStart, const Vec2& lineEnd, char* buffer) {
+	int x0 = (int)lineStart.x();
+	int x1 = (int)lineEnd.x();
+	int y0 = (int)lineStart.y();
+	int y1 = (int)lineEnd.y();
+
+	if (y0 > y1) {
+		int tmp = x0;
+		x0 = x1;
+		x1 = tmp;
+
+		tmp = y0;
+		y0 = y1;
+		y1 = tmp;
+	}
+
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+
+	int dir = dx < 0 ? -1 : 1;
+	dx *= dir;
+
+	if (dy == 0) { return; }
+
+	int x = x0;
+	int D = 2 * dx - dy;
+
+	for (int i = 0; i < dy + 1; ++i) {
+		buffer[x + (y0 + i) * WIDTH] = '*';
+		if (D >= 0) {
+			x += dir;
+			D -= 2 * dy;
+		}
+		D += 2 * dx;
+	}
+}
+
+void rasteriseLine(const Vec2& lineStart, const Vec2& lineEnd, char* buffer) {
+	if (fabs(lineEnd.x() - lineStart.x()) > fabs(lineEnd.y() - lineStart.y())) {
+		drawLineHorizontal(lineStart, lineEnd, buffer);
+	} else {
+		drawLineVertical(lineStart, lineEnd, buffer);
+	}
 }
 
 void fillTriangle(const Vec2& v1, const Vec2& v2, const Vec2& v3, char* buffer) {
@@ -120,15 +198,13 @@ int main(void) {
 
 		fillTriangle(p1Console, p2Console, p3Console, buffer);
 
-		//rasteriseLine(p1Console, p2Console, buffer);
-		//rasteriseLine(p2Console, p3Console, buffer);
-		//rasteriseLine(p3Console, p1Console, buffer);
+		rasteriseLine(p1Console, p2Console, buffer);
+		rasteriseLine(p2Console, p3Console, buffer);
+		rasteriseLine(p3Console, p1Console, buffer);
 
-		//rasteriseLine(Vec2(10.0, 10.0), Vec2(30.0, 10.0), buffer);
-
-		buffer[(int)p1Console.x() + (int)p1Console.y() * WIDTH] = '*';
-		buffer[(int)p2Console.x() + (int)p2Console.y() * WIDTH] = '*';
-		buffer[(int)p3Console.x() + (int)p3Console.y() * WIDTH] = '*';
+		buffer[(int)p1Console.x() + (int)p1Console.y() * WIDTH] = '@';
+		buffer[(int)p2Console.x() + (int)p2Console.y() * WIDTH] = '@';
+		buffer[(int)p3Console.x() + (int)p3Console.y() * WIDTH] = '@';
 
 		for (int i = 0; i < SCREEN_SIZE; ++i) {
 			if (i != 0 && !(i % WIDTH)) { bufferString += "\n"; }
