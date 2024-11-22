@@ -2,10 +2,16 @@
 
 #include "Vec3.h"
 
-class Triangle3D {
+class Triangle {
 public:
-	Triangle3D(const Vec3* vertices) {
+	Triangle(const Vec3* vertices) {
 		for (int i = 0; i < 3; ++i) { mVertices[i] = vertices[i]; }
+	}
+
+	Triangle(const Vec3& v1, const Vec3& v2, const Vec3& v3) {
+		mVertices[0] = v1;
+		mVertices[1] = v2;
+		mVertices[2] = v3;
 	}
 
 	Vec3 p1(void) const { return mVertices[0]; }

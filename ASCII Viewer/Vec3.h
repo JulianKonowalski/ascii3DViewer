@@ -5,7 +5,7 @@
 class Vec3 {
 public:
 	Vec3(void) : mX(0.0f), mY(0.0f), mZ(0.0f) {}
-	Vec3(double x, double y, double z = 0.0) : mX(x), mY(y), mZ(z) {} //if used as Vec2
+	Vec3(double x, double y, double z) : mX(x), mY(y), mZ(z) {}
 	Vec3(const Vec3& v) : mX(v.mX), mY(v.mY), mZ(v.mZ) {}
 
 	double x(void) const { return mX; }

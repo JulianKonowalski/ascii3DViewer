@@ -36,14 +36,19 @@ Vec3 graphics::project(const Vec3& vector, const int FOV) {
 		xProjected /= scalingFactor;
 		yProjected /= scalingFactor;
 	}
-	return Vec3(xProjected, yProjected, vector.z()); //z is passed as depth information
+	return Vec3(xProjected, yProjected, vector.z());	//z is passed as depth information
 }
 
-Vec3 graphics::toConsoleCoordinates(const Vec3& worldCoord, const int screenWidth, const int height) {
+Vec3 graphics::toConsoleCoordinates(const Vec3& worldCoord, const int screenWidth, const int screenHeight) {
 	return Vec3(
 		(worldCoord.x() + 1) / 2 * (screenWidth - 1),
-		((-1 * worldCoord.y()) + 1) / 2 * (height - 1)
+		((-1 * worldCoord.y()) + 1) / 2 * (screenHeight - 1),
+		worldCoord.z()									//z is passed as depth information
 	);
+}
+
+void graphics::drawPoint(const Vec3& point, int width, char* buffer) {
+	buffer[(int)point.x() + (int)point.y() * width] = '@';
 }
 
 void drawLineHorizontal(const Vec3& lineStart, const Vec3& lineEnd, int screenWidth, char* buffer) {//helper function
@@ -129,14 +134,14 @@ void graphics::drawLine(const Vec3& lineStart, const Vec3& lineEnd, int screenWi
 	}
 }
 
-void graphics::fillTriangle(const Vec3& v1, const Vec3& v2, const Vec3& v3, int screenWidth, char* buffer) {
-	double y1 = v1.y();
-	double y2 = v2.y();
-	double y3 = v3.y();
-
-	double x1 = v1.x();
-	double x2 = v2.x();
-	double x3 = v3.x();
+void graphics::fillTriangle(const Triangle& triangle, int screenWidth, char* buffer) {
+	double y1 = triangle.p1().y();
+	double y2 = triangle.p2().y();
+	double y3 = triangle.p3().y();	
+	
+	double x1 = triangle.p1().x();
+	double x2 = triangle.p2().x();
+	double x3 = triangle.p3().x();
 
 	int xMin = (int)std::min(std::min(x1, x2), x3);
 	int xMax = (int)std::max(std::max(x1, x2), x3);
