@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Triangle3D.h">
@@ -26,10 +29,7 @@
     <ClInclude Include="Vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vec2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Triangle2D.h">
+    <ClInclude Include="Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
