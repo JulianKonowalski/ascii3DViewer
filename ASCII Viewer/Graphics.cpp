@@ -1,5 +1,14 @@
 #include "Graphics.h"
 
+std::string graphics::getBuffer(const int& screenWidth, const int& screenHeight) {
+	return std::string(screenWidth * screenHeight, ' ');
+}
+
+void graphics::clearBuffer(std::string& buffer, const int& screenWidth, const int& screenHeight) {
+	buffer.clear();
+	buffer.insert(0, screenWidth * screenHeight, ' ');
+}
+
 Vec3 graphics::rotate(const Vec3& point, const Vec3& rotation) {
 	double yaw = rotation.z() / 180.0 * 3.1415;
 	double pitch = rotation.y() / 180.0 * 3.1415;
@@ -55,11 +64,11 @@ Vec3 graphics::toConsoleCoordinates(const Vec3& coord, const int& screenWidth, c
 	);
 }
 
-void graphics::drawPoint(const Vec3& point, int& screenWidth, char* buffer) {
+void graphics::rasterisePoint(const Vec3& point, const int& screenWidth, std::string& buffer) {
 	buffer[(int)point.x() + (int)point.y() * screenWidth] = '@';
 }
 
-void drawLineHorizontal(const Vec3& lineStart, const Vec3& lineEnd, const int& screenWidth, char* buffer) {//helper function
+void rasteriseLineHorizontal(const Vec3& lineStart, const Vec3& lineEnd, const int& screenWidth, std::string& buffer) {//helper function
 	int x0 = (int)lineStart.x();
 	int x1 = (int)lineEnd.x();
 	int y0 = (int)lineStart.y();
@@ -96,7 +105,7 @@ void drawLineHorizontal(const Vec3& lineStart, const Vec3& lineEnd, const int& s
 	}
 }
 
-void drawLineVertical(const Vec3& lineStart, const Vec3& lineEnd, int screenWidth, char* buffer) { //helper function
+void rasteriseLineVertical(const Vec3& lineStart, const Vec3& lineEnd, const int& screenWidth, std::string& buffer) { //helper function
 	int x0 = (int)lineStart.x();
 	int x1 = (int)lineEnd.x();
 	int y0 = (int)lineStart.y();
@@ -133,16 +142,16 @@ void drawLineVertical(const Vec3& lineStart, const Vec3& lineEnd, int screenWidt
 	}
 }
 
-void graphics::drawLine(const Vec3& lineStart, const Vec3& lineEnd, const int& screenWidth, char* buffer) {
+void graphics::rasteriseLine(const Vec3& lineStart, const Vec3& lineEnd, const int& screenWidth, std::string& buffer) {
 	if (fabs(lineEnd.x() - lineStart.x()) > fabs(lineEnd.y() - lineStart.y())) {
-		drawLineHorizontal(lineStart, lineEnd, screenWidth, buffer);
+		rasteriseLineHorizontal(lineStart, lineEnd, screenWidth, buffer);
 	}
 	else {
-		drawLineVertical(lineStart, lineEnd, screenWidth, buffer);
+		rasteriseLineVertical(lineStart, lineEnd, screenWidth, buffer);
 	}
 }
 
-void fillTriangle(const Triangle& triangle, int screenWidth, char* buffer) {
+void fillTriangle(const Triangle& triangle, const char& shade, const int& screenWidth, std::string& buffer) {
 	double y1 = triangle.p1().y();
 	double y2 = triangle.p2().y();
 	double y3 = triangle.p3().y();	
@@ -161,28 +170,28 @@ void fillTriangle(const Triangle& triangle, int screenWidth, char* buffer) {
 			if ((x1 - x2) * (y - y1) - (y1 - y2) * (x - x1) >= 0 &&
 				(x2 - x3) * (y - y2) - (y2 - y3) * (x - x2) >= 0 &&
 				(x3 - x1) * (y - y3) - (y3 - y1) * (x - x3) >= 0) {
-				buffer[x + y * screenWidth] = '.';
+				buffer[x + y * screenWidth] = shade;
 			}
 		}
 	}
 }
 
-void outlineTriangle(const Triangle& triangle, int screenWidth, char* buffer) {
-	graphics::drawLine(triangle.p1(), triangle.p2(), screenWidth, buffer);
-	graphics::drawLine(triangle.p2(), triangle.p3(), screenWidth, buffer);
-	graphics::drawLine(triangle.p3(), triangle.p1(), screenWidth, buffer);
+void outlineTriangle(const Triangle& triangle, const int& screenWidth, std::string& buffer) {
+	graphics::rasteriseLine(triangle.p1(), triangle.p2(), screenWidth, buffer);
+	graphics::rasteriseLine(triangle.p2(), triangle.p3(), screenWidth, buffer);
+	graphics::rasteriseLine(triangle.p3(), triangle.p1(), screenWidth, buffer);
 }
 
-void triangleVertices(const Triangle& triangle, int screenWidth, char* buffer) {
-	graphics::drawPoint(triangle.p1(), screenWidth, buffer);
-	graphics::drawPoint(triangle.p2(), screenWidth, buffer);
-	graphics::drawPoint(triangle.p3(), screenWidth, buffer);
+void triangleVertices(const Triangle& triangle, const int& screenWidth, std::string& buffer) {
+	graphics::rasterisePoint(triangle.p1(), screenWidth, buffer);
+	graphics::rasterisePoint(triangle.p2(), screenWidth, buffer);
+	graphics::rasterisePoint(triangle.p3(), screenWidth, buffer);
 }
 
-void graphics::drawTriangle(const Triangle& triangle, drawTriangleMode mode, const int& screenWidth, char* buffer) {
+void graphics::rasteriseTriangle(const Triangle& triangle, const drawTriangleMode& mode, const char& shade, const int& screenWidth, std::string& buffer) {
 	switch (mode) {
 	case TRIANGLE_FULL:
-		fillTriangle(triangle, screenWidth, buffer);
+		fillTriangle(triangle, shade, screenWidth, buffer);
 		outlineTriangle(triangle, screenWidth, buffer);
 		triangleVertices(triangle, screenWidth, buffer);
 		break;
@@ -193,7 +202,19 @@ void graphics::drawTriangle(const Triangle& triangle, drawTriangleMode mode, con
 		triangleVertices(triangle, screenWidth, buffer);
 		break;
 	case TRIANGLE_INSIDE:
-		fillTriangle(triangle, screenWidth, buffer);
+		fillTriangle(triangle, shade, screenWidth, buffer);
 		break;
 	}
+}
+
+void insertNewLines(std::string& buffer, const int& screenWidth, const int& screenHeight) {
+	for (int i = 1; i < screenHeight; ++i) {
+		buffer.insert(i * screenWidth + (i - 1), 1, '\n');
+	}
+}
+
+void graphics::drawFrame(std::string& buffer, const int& screenWidth, const int& screenHeight) {
+	insertNewLines(buffer, screenWidth, screenHeight);
+	system("cls");
+	std::cout << buffer;
 }

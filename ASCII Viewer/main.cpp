@@ -5,8 +5,7 @@
 #include <thread>
 
 const int WIDTH = 150, HEIGHT = 75;
-const int SCREEN_SIZE = WIDTH * HEIGHT;
-const int FOV_ANGLE = 45;
+const int FOV = 45;
 
 Triangle createTriangle(void) {
 	return Triangle(
@@ -20,8 +19,7 @@ using namespace graphics;
 
 int main(void) {
 
-	char buffer[SCREEN_SIZE];
-	std::string bufferString;
+	std::string buffer = getBuffer(WIDTH, HEIGHT);
 
 	Triangle triangle = createTriangle();
 
@@ -29,26 +27,19 @@ int main(void) {
 	Vec3 translationVector(0.0, 0.0, 5.0);
 
 	while (true) {
-		memset(buffer, ' ', SCREEN_SIZE);
 	
 		triangle.setP1(rotate(triangle.p1(), rotationVector));
 		triangle.setP2(rotate(triangle.p2(), rotationVector));
 		triangle.setP3(rotate(triangle.p3(), rotationVector));
 
-		Vec3 p1 = projectPoint(translate(triangle.p1(), translationVector), WIDTH, HEIGHT, FOV_ANGLE);
-		Vec3 p2 = projectPoint(translate(triangle.p2(), translationVector), WIDTH, HEIGHT, FOV_ANGLE);
-		Vec3 p3 = projectPoint(translate(triangle.p3(), translationVector), WIDTH, HEIGHT, FOV_ANGLE);
+		Vec3 p1 = projectPoint(translate(triangle.p1(), translationVector), WIDTH, HEIGHT, FOV);
+		Vec3 p2 = projectPoint(translate(triangle.p2(), translationVector), WIDTH, HEIGHT, FOV);
+		Vec3 p3 = projectPoint(translate(triangle.p3(), translationVector), WIDTH, HEIGHT, FOV);
 
-		drawTriangle(Triangle(p1, p2, p3), TRIANGLE_FULL, WIDTH, buffer);
+		rasteriseTriangle(Triangle(p1, p2, p3), TRIANGLE_INSIDE, 'x', WIDTH, buffer);
 
-		for (int i = 0; i < SCREEN_SIZE; ++i) { //change this
-			if (i != 0 && !(i % WIDTH)) { bufferString += "\n"; }
-			bufferString += buffer[i];
-		}
-
-		system("cls");
-		std::cout << bufferString;
-		bufferString.clear();
+		drawFrame(buffer, WIDTH, HEIGHT);
+		clearBuffer(buffer, WIDTH, HEIGHT);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}

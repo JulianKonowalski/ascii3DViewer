@@ -18,9 +18,9 @@ public:
 	Vec3 p2(void) const { return mVertices[1]; }
 	Vec3 p3(void) const { return mVertices[2]; }
 
-	void setP1(Vec3 point) { mVertices[0] = point; }
-	void setP2(Vec3 point) { mVertices[1] = point; }
-	void setP3(Vec3 point) { mVertices[2] = point; }
+	void setP1(const Vec3& point) { mVertices[0] = point; }
+	void setP2(const Vec3& point) { mVertices[1] = point; }
+	void setP3(const Vec3& point) { mVertices[2] = point; }
 
 private:
 	Vec3 mVertices[3];
