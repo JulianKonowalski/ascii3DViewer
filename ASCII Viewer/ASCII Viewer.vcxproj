@@ -129,11 +129,12 @@
   <ItemGroup>
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Triangle.h" />
-    <ClInclude Include="Vec3.h" />
+    <ClInclude Include="Graphics.hpp" />
+    <ClInclude Include="Triangle.hpp" />
+    <ClInclude Include="Vec3.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

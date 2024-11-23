@@ -1,5 +1,5 @@
-#include "Graphics.h"
-#include "Triangle.h"
+#include "Graphics.hpp"
+#include "Triangle.hpp"
 
 #include <iostream>
 #include <thread>
@@ -23,7 +23,7 @@ int main(void) {
 
 	Triangle triangle = createTriangle();
 
-	Vec3 rotationVector(0.0, 2.0, 1.0);
+	Vec3 rotationVector(0.0, 10.0, 10.0);
 	Vec3 translationVector(0.0, 0.0, 5.0);
 
 	while (true) {
@@ -36,7 +36,8 @@ int main(void) {
 		Vec3 p2 = projectPoint(translate(triangle.p2(), translationVector), WIDTH, HEIGHT, FOV);
 		Vec3 p3 = projectPoint(translate(triangle.p3(), translationVector), WIDTH, HEIGHT, FOV);
 
-		rasteriseTriangle(Triangle(p1, p2, p3), TRIANGLE_INSIDE, 'x', WIDTH, buffer);
+		char triangleShade = shadeTriangle(triangle, Vec3(0.0, 0.0, 1.0)); //there's global light, so shading after translation is ok
+		rasteriseTriangle(Triangle(p1, p2, p3), TRIANGLE_INSIDE, triangleShade, WIDTH, buffer);
 
 		drawFrame(buffer, WIDTH, HEIGHT);
 		clearBuffer(buffer, WIDTH, HEIGHT);

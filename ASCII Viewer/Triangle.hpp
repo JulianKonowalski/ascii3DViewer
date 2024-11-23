@@ -1,6 +1,7 @@
-#pragma once
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
 
-#include "Vec3.h"
+#include "Vec3.hpp"
 
 class Triangle {
 public:
@@ -25,3 +26,5 @@ public:
 private:
 	Vec3 mVertices[3];
 };
+
+#endif // !TRIANGLE_H
