@@ -1,5 +1,4 @@
-#ifndef VEC3_H
-#define VEC3_H
+#pragma once
 
 #include <iostream>
 
@@ -40,5 +39,3 @@ namespace vector3 {
 
 	double dotProduct(const Vec3& v1, const Vec3& v2);
 }
-
-#endif // !VEC3_H

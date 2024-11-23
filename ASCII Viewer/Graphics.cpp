@@ -9,7 +9,7 @@ void graphics::clearBuffer(std::string& buffer, const int& screenWidth, const in
 	buffer.insert(0, screenWidth * screenHeight, ' ');
 }
 
-Vec3 graphics::rotate(const Vec3& point, const Vec3& rotation) {
+Vec3 graphics::rotatePoint(const Vec3& point, const Vec3& rotation) {
 	double yaw = rotation.z() / 180.0 * 3.1415;
 	double pitch = rotation.y() / 180.0 * 3.1415;
 	double roll = rotation.x() / 180.0 * 3.1415;
@@ -32,11 +32,47 @@ Vec3 graphics::rotate(const Vec3& point, const Vec3& rotation) {
 	return Vec3(xRotated, yRotated, zRotated);
 }
 
-Vec3 graphics::translate(const Vec3& point, const Vec3& offset) {
+Triangle graphics::rotateTriangle(const Triangle& triangle, const Vec3& rotation) {
+	const Vec3* vertices = triangle.getVertices();
+	Vec3 rotated[3];
+	for (int i = 0; i < 3; ++i) {
+		rotated[i] = graphics::rotatePoint(vertices[i], rotation);
+	}
+	return Triangle(rotated[0], rotated[1], rotated[2]);
+}
+
+Mesh graphics::rotateMesh(const Mesh& mesh, const Vec3& rotation) {
+	std::vector<Triangle> rotated(mesh.getFaces().size());
+	const std::vector<Triangle>& faces = mesh.getFaces();
+	for (int i = 0; i < mesh.getFaces().size(); ++i) {
+		rotated[i] = graphics::rotateTriangle(faces[i], rotation);
+	}
+	return Mesh(rotated);
+}
+
+Vec3 graphics::translatePoint(const Vec3& point, const Vec3& offset) {
 	return Vec3(point.x() + offset.x(), point.y() + offset.y(), point.z() + offset.z());
 }
 
-Vec3 graphics::projectPoint(Vec3 point, const int& screenWidth, const int& screenHeight, const int& FOV) {
+Triangle graphics::translateTriangle(const Triangle& triangle, const Vec3& offset) {
+	const Vec3* vertices = triangle.getVertices();
+	Vec3 translated[3];
+	for (int i = 0; i < 3; ++i) {
+		translated[i] = graphics::translatePoint(vertices[i], offset);
+	}
+	return Triangle(translated[0], translated[1], translated[2]);
+}
+
+Mesh graphics::translateMesh(const Mesh& mesh, const Vec3& offset) {
+	std::vector<Triangle> translated(mesh.getFaces().size());
+	const std::vector<Triangle>& faces = mesh.getFaces();
+	for (int i = 0; i < mesh.getFaces().size(); ++i) {
+		translated[i] = graphics::translateTriangle(faces[i], offset);
+	}
+	return Mesh(translated);
+}
+
+Vec3 graphics::projectPoint(const Vec3& point, const int& screenWidth, const int& screenHeight, const int& FOV) {
 	double angleRadians = (FOV / 180.0) * 3.1415;
 	double xProjected = point.x();
 	double yProjected = point.y();
@@ -48,12 +84,21 @@ Vec3 graphics::projectPoint(Vec3 point, const int& screenWidth, const int& scree
 	return graphics::toConsoleCoordinates(Vec3(xProjected, yProjected, point.z()), screenWidth, screenHeight);	//z is passed as depth information
 }
 
-Triangle graphics::projectTriangle(Triangle triangle, const int& screenWidth, const int& screenHeight, const int& FOV) {
+Triangle graphics::projectTriangle(const Triangle& triangle, const int& screenWidth, const int& screenHeight, const int& FOV) {
 	return Triangle(
 		graphics::projectPoint(triangle.p1(), screenWidth, screenHeight, FOV),
 		graphics::projectPoint(triangle.p2(), screenWidth, screenHeight, FOV),
 		graphics::projectPoint(triangle.p3(), screenWidth, screenHeight, FOV)
 	);
+}
+
+Mesh graphics::projectMesh(const Mesh& mesh, const int& screenWidth, const int& screenHeight, const int& FOV) {
+	std::vector<Triangle> projected(mesh.getFaces().size());
+	const std::vector<Triangle>& faces = mesh.getFaces();
+	for (int i = 0; i < mesh.getFaces().size(); ++i) {
+		projected[i] = graphics::projectTriangle(faces[i], screenWidth, screenHeight, FOV);
+	}
+	return Mesh(projected);
 }
 
 Vec3 getTriangleNormal(const Triangle& triangle) {
@@ -213,14 +258,63 @@ void graphics::rasteriseTriangle(const Triangle& triangle, const drawTriangleMod
 		outlineTriangle(triangle, screenWidth, buffer);
 		triangleVertices(triangle, screenWidth, buffer);
 		break;
-	case TRIANGLE_OUTLINE:
+	case TRIANGLE_EDGES:
 		outlineTriangle(triangle, screenWidth, buffer);
 		break;
 	case TRIANGLE_VERTICES:
 		triangleVertices(triangle, screenWidth, buffer);
 		break;
-	case TRIANGLE_INSIDE:
+	case TRIANGLE_SHADED:
 		fillTriangle(triangle, shade, screenWidth, buffer);
+		break;
+	}
+}
+
+void graphics::rasteriseMesh(const Mesh& mesh, const drawMeshMode& mode, const Vec3& lightDirection, const int& screenWidth, const int& screenHeight, const int& FOV, std::string& buffer) {
+	const std::vector<Triangle>& faces = mesh.getFaces();
+	switch (mode) {
+	case MESH_FULL:
+		for (const Triangle& face : faces) {
+			graphics::rasteriseTriangle(
+				graphics::projectTriangle(face, screenWidth, screenHeight, FOV),
+				TRIANGLE_FULL,
+				graphics::shadeTriangle(face, lightDirection),
+				screenWidth,
+				buffer
+			);
+		}
+	case MESH_SHADED:
+		for (const Triangle& face : faces) {
+			graphics::rasteriseTriangle(
+				graphics::projectTriangle(face, screenWidth, screenHeight, FOV), 
+				TRIANGLE_SHADED, 
+				graphics::shadeTriangle(face, lightDirection), 
+				screenWidth, 
+				buffer
+			);
+		}
+		break;
+	case MESH_EDGES:
+		for (const Triangle& face : faces) {
+			graphics::rasteriseTriangle(
+				graphics::projectTriangle(face, screenWidth, screenHeight, FOV),
+				TRIANGLE_EDGES,
+				' ',
+				screenWidth,
+				buffer
+			);
+		}
+		break;
+	case MESH_VERTICES:
+		for (const Triangle& face : faces) {
+			graphics::rasteriseTriangle(
+				graphics::projectTriangle(face, screenWidth, screenHeight, FOV),
+				TRIANGLE_VERTICES,
+				' ',
+				screenWidth,
+				buffer
+			);
+		}
 		break;
 	}
 }

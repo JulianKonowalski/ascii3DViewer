@@ -1,5 +1,4 @@
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#pragma once
 
 #include "Vec3.hpp"
 
@@ -15,6 +14,13 @@ public:
 		mVertices[2] = v3;
 	}
 
+	Triangle() {
+		mVertices[0] = Vec3();
+		mVertices[1] = Vec3();
+		mVertices[2] = Vec3();
+	}
+
+	const Vec3* getVertices(void) const { return mVertices; }
 	Vec3 p1(void) const { return mVertices[0]; }
 	Vec3 p2(void) const { return mVertices[1]; }
 	Vec3 p3(void) const { return mVertices[2]; }
@@ -26,5 +32,3 @@ public:
 private:
 	Vec3 mVertices[3];
 };
-
-#endif // !TRIANGLE_H
