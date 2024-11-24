@@ -1,10 +1,12 @@
 #include "Graphics.hpp"
 #include "Mesh.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <thread>
 
-const int WIDTH = 150, HEIGHT = 75;
+const int WIDTH = 400, HEIGHT = 300;
+const int SCREEN_SIZE = WIDTH * HEIGHT;
 const int FOV = 45;
 
 Mesh createMesh(void) {
@@ -18,7 +20,7 @@ Mesh createMesh(void) {
 		Vec3(1, 2, 3),
 		Vec3(1, 3, 4),
 		Vec3(1, 4, 2),
-		Vec3(2, 3, 4)
+		Vec3(4, 3, 2)
 	};
 	return Mesh(vertices, indices);
 }
@@ -27,23 +29,28 @@ using namespace graphics;
 
 int main(void) {
 
-	std::string buffer = getBuffer(WIDTH, HEIGHT);
+	std::string frameBuffer(SCREEN_SIZE, ' ');
+
+	double* zBuffer = new double[SCREEN_SIZE];
+	std::fill_n(zBuffer, SCREEN_SIZE, 0.0);
+
+	const Vec3 rotationVector(0.0, 2.0, 1.0);
+	const Vec3 translationVector(0.0, 0.0, 5.0);
+	const Vec3 lightingVector(1.0, 1.0, 1.0);
 
 	Mesh mesh = createMesh();
-
-	Vec3 rotationVector(0.0, 10.0, 10.0);
-	Vec3 translationVector(0.0, 0.0, 5.0);
 
 	while (true) {
 
 		mesh = rotateMesh(mesh, rotationVector);
-
 		Mesh translatedMesh = translateMesh(mesh, translationVector);
+		drawMesh(translatedMesh, MESH_SHADED, lightingVector, WIDTH, HEIGHT, FOV, frameBuffer, zBuffer);
 
-		rasteriseMesh(translatedMesh, MESH_FULL, Vec3(0.0, 0.0, 1.0), WIDTH, HEIGHT, FOV, buffer);
+		drawFrame(frameBuffer, WIDTH, HEIGHT);
 
-		drawFrame(buffer, WIDTH, HEIGHT);
-		clearBuffer(buffer, WIDTH, HEIGHT);
+		frameBuffer.clear();
+		frameBuffer.insert(0, SCREEN_SIZE, ' ');
+		std::fill_n(zBuffer, SCREEN_SIZE, 0.0);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}

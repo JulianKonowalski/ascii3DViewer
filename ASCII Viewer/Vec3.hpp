@@ -38,4 +38,11 @@ namespace vector3 {
 	Vec3 normalize(const Vec3& vector);
 
 	double dotProduct(const Vec3& v1, const Vec3& v2);
+
+	Vec3 minX(const Vec3& v1, const Vec3& v2);
+	Vec3 minY(const Vec3& v1, const Vec3& v2);
+	Vec3 minZ(const Vec3& v1, const Vec3& v2);	
+	Vec3 maxX(const Vec3& v1, const Vec3& v2);
+	Vec3 maxY(const Vec3& v1, const Vec3& v2);
+	Vec3 maxZ(const Vec3& v1, const Vec3& v2);
 }

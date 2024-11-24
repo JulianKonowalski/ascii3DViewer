@@ -11,9 +11,6 @@ namespace graphics {
 	enum drawTriangleMode;
 	enum drawMeshMode;
 
-	std::string getBuffer(const int& screenWidth, const int& screenHeight);
-	void clearBuffer(std::string& buffer, const int& screenWidth, const int& screenHeight);
-
 	Vec3 rotatePoint(const Vec3& point, const Vec3& rotation); //rotate point in 3D space
 	Triangle rotateTriangle(const Triangle& triangle, const Vec3& rotation); //rotate triangle in 3D space
 	Mesh rotateMesh(const Mesh& mesh, const Vec3& rotation); //rotate mesh in 3D space
@@ -28,10 +25,12 @@ namespace graphics {
 
 	Vec3 toConsoleCoordinates(const Vec3& coord, const int& screenWidth, const int& screenHeight); //translate from [-1.0, 1.0] coordinates to [0, screenWidth] and [0, screenHeight] coordinates
 
-	void rasterisePoint(const Vec3& point, const char& fill, const int& screenWidth, std::string& buffer); //insert a point into buffer
-	void rasteriseLine(const Vec3& lineStart, const Vec3& lineEnd, const char& fill, const int& screenWidth, std::string& buffer); //insert a line into buffer
-	void rasteriseTriangle(const Triangle& triangle, const drawTriangleMode& mode, const char& fill, const int& screenWidth, std::string& buffer); //insert a triangle into buffer
-	void rasteriseMesh(const Mesh& mesh, const drawMeshMode& mode, const Vec3& lightDirection, const int& screenWidth, const int& screenHeight, const int& FOV, std::string& buffer); //insert mesh into buffer
+	void rasterisePoint(const Vec3& point, const char& fill, const int& screenWidth, const int& screenHeight, std::string& frameBuffer, double* zBuffer); //insert a point into buffer
+	void rasteriseLine(const Vec3& lineStart, const Vec3& lineEnd, const char& fill, const int& screenWidth, const int& screenHeight, std::string& frameBuffer, double* zBuffer); //insert a line into buffer
+	void rasteriseTriangle(const Triangle& triangle, const drawTriangleMode& mode, const char& fill, const int& screenWidth, const int& screenHeight, std::string& frameBuffer, double* zBuffer); //insert a triangle into buffer
+
+
+	void drawMesh(const Mesh& mesh, const drawMeshMode& mode, const Vec3& lightDirection, const int& screenWidth, const int& screenHeight, const int& FOV, std::string& frameBuffer, double* zBuffer); //insert mesh into buffer
 
 	void drawFrame(std::string& buffer, const int& screenWidth, const int& screenHeight);
 

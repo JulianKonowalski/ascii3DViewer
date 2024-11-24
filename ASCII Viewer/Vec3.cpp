@@ -48,3 +48,33 @@ Vec3 vector3::normalize(const Vec3& vector) {
 double vector3::dotProduct(const Vec3& v1, const Vec3& v2) {
 	return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
+
+Vec3 vector3::minX(const Vec3& v1, const Vec3& v2) {
+	if (v1.x() < v2.x()) { return v1; }
+	return v2;
+}
+
+Vec3 vector3::minY(const Vec3& v1, const Vec3& v2) {
+	if (v1.y() < v2.y()) { return v1; }
+	return v2;
+}
+
+Vec3 vector3::minZ(const Vec3& v1, const Vec3& v2) {
+	if (v1.z() < v2.z()) { return v1; }
+	return v2;
+}
+
+Vec3 vector3::maxX(const Vec3& v1, const Vec3& v2) {
+	if (v1.x() > v2.x()) { return v1; }
+	return v2;
+}
+
+Vec3 vector3::maxY(const Vec3& v1, const Vec3& v2) {
+	if (v1.y() > v2.y()) { return v1; }
+	return v2;
+}
+
+Vec3 vector3::maxZ(const Vec3& v1, const Vec3& v2) {
+	if (v1.z() > v2.z()) { return v1; }
+	return v2;
+}
