@@ -1,11 +1,12 @@
-#include "Graphics.hpp"
-#include "Mesh.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <thread>
 
-const int WIDTH = 400, HEIGHT = 300;
+#include "Graphics.hpp"
+#include "Mesh.hpp"
+#include "ObjFileLoader.hpp"
+
+const int WIDTH = 400, HEIGHT = 200;
 const int SCREEN_SIZE = WIDTH * HEIGHT;
 const int FOV = 45;
 
@@ -34,16 +35,17 @@ int main(void) {
 	double* zBuffer = new double[SCREEN_SIZE];
 	std::fill_n(zBuffer, SCREEN_SIZE, 0.0);
 
-	const Vec3 rotationVector(0.0, 2.0, 1.0);
-	const Vec3 translationVector(0.0, 0.0, 5.0);
-	const Vec3 lightingVector(1.0, 1.0, 1.0);
+	const Vec3 rotationVector(0.0, 5.0, 0.0);
+	const Vec3 translationVector(0.0, -1.0, 6.0);
+	const Vec3 lightingVector(1.0, -1.0, 1.0);
 
-	Mesh mesh = createMesh();
+	ObjFileLoader objLoader;
+	Mesh* mesh = objLoader.loadFromFile("350z.obj");
 
 	while (true) {
 
-		mesh = rotateMesh(mesh, rotationVector);
-		Mesh translatedMesh = translateMesh(mesh, translationVector);
+		*mesh = rotateMesh(*mesh, rotationVector);
+		Mesh translatedMesh = translateMesh(*mesh, translationVector);
 		drawMesh(translatedMesh, MESH_SHADED, lightingVector, WIDTH, HEIGHT, FOV, frameBuffer, zBuffer);
 
 		drawFrame(frameBuffer, WIDTH, HEIGHT);
@@ -52,7 +54,7 @@ int main(void) {
 		frameBuffer.insert(0, SCREEN_SIZE, ' ');
 		std::fill_n(zBuffer, SCREEN_SIZE, 0.0);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 
 	return 0;

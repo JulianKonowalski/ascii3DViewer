@@ -92,18 +92,8 @@ Mesh graphics::projectMesh(const Mesh& mesh, const int& screenWidth, const int& 
 	return Mesh(projected);
 }
 
-Vec3 getTriangleNormal(const Triangle& triangle) {
-	Vec3 A = triangle.p1() - triangle.p2();
-	Vec3 B = triangle.p3() - triangle.p1();
-	return Vec3(
-		A.y() * B.z() - A.z() * B.y(),
-		A.z() * B.x() - A.x() * B.z(),
-		A.x() * B.y() - A.y() * B.x()
-	);
-}
-
 char graphics::shadeTriangle(const Triangle& triangle, const Vec3& lightDirection) {
-	Vec3 triangleNormal = getTriangleNormal(triangle);
+	Vec3 triangleNormal = triangle.normal();
 	double cosAngle = vector3::dotProduct(triangleNormal, lightDirection) / ( vector3::length(triangleNormal) * vector3::length(lightDirection) );
 	double shadeIndex = -cosAngle * numberOfShades;
 	shadeIndex = shadeIndex >= 0 ? shadeIndex : 0;

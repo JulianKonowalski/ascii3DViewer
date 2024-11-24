@@ -130,11 +130,13 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ObjFileLoader.cpp" />
     <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.hpp" />
     <ClInclude Include="Mesh.hpp" />
+    <ClInclude Include="ObjFileLoader.hpp" />
     <ClInclude Include="Triangle.hpp" />
     <ClInclude Include="Vec3.hpp" />
   </ItemGroup>
