@@ -35,6 +35,6 @@ The program uses **Bresenham's line algorithm**, which is fast but not the faste
 Another weak point is triangle rasterisation, more specifically, determining which points are a part of the rasterised triangle and must be shaded. Currently, I'm creating a bounding box around the projected triangle and scanning every line of the box to determine if the point should be shaded or not. It's okay for most triangles, but as the triangle gets wider and shorter (or the resolution is set higher), unnecessary checks increase dramatically.
 
 # Included assets
-*Cube exported from Blender
-*Suzanne exported from Blender
-*[Nissan 350Z](https://www.turbosquid.com/3d-models/nissan-350z-japanese-sports-coupe-with-interior-model-3d-model-2049724) made by [Bbenedict_](https://www.turbosquid.com/Search/Artists/Bbenedict_)
+* Cube exported from Blender
+* Suzanne exported from Blender
+* [Nissan 350Z](https://www.turbosquid.com/3d-models/nissan-350z-japanese-sports-coupe-with-interior-model-3d-model-2049724) made by [Bbenedict_](https://www.turbosquid.com/Search/Artists/Bbenedict_)
