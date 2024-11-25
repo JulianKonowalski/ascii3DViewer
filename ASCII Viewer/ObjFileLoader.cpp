@@ -84,10 +84,5 @@ void ObjFileLoader::loadFace(void) {
 		mVertices->at(vertexIndices[1] - 1),
 		mVertices->at(vertexIndices[0] - 1)
 	);
-	//if (face.normal() != mNormals->at(normalIndex - 1)) {
-	//	Vec3 tmp = face.p1();
-	//	face.setP1(face.p3());
-	//	face.setP3(tmp);
-	//}
 	mFaces->push_back(face);
 }

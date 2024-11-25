@@ -8,6 +8,7 @@
 class ObjFileLoader {
 public:
 	ObjFileLoader() : mVertices(nullptr), mNormals(nullptr), mFaces(nullptr) {}
+	~ObjFileLoader() { closeObjFile();  cleanup(); }
 	Mesh* loadFromFile(const std::string& filePath);
 
 private:

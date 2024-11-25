@@ -6,25 +6,7 @@
 #include "Mesh.hpp"
 #include "ObjFileLoader.hpp"
 
-const int WIDTH = 400, HEIGHT = 200;
-const int SCREEN_SIZE = WIDTH * HEIGHT;
-const int FOV = 45;
-
-Mesh createMesh(void) {
-	std::vector<Vec3> vertices = {
-		Vec3(0.0, 1.0, 0.0),
-		Vec3(0.0, 0.0, 1.0),
-		Vec3(1.0, 0.0, 0.0),
-		Vec3(-1.0, 0.0, 0.0)
-	};
-	std::vector<Vec3> indices = {
-		Vec3(1, 2, 3),
-		Vec3(1, 3, 4),
-		Vec3(1, 4, 2),
-		Vec3(4, 3, 2)
-	};
-	return Mesh(vertices, indices);
-}
+const int WIDTH = 400, HEIGHT = 200, FOV = 45, SCREEN_SIZE = WIDTH * HEIGHT;
 
 using namespace graphics;
 
@@ -56,6 +38,8 @@ int main(void) {
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
+
+	delete mesh;
 
 	return 0;
 }

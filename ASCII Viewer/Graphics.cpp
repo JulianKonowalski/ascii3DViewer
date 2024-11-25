@@ -33,9 +33,10 @@ Triangle graphics::rotateTriangle(const Triangle& triangle, const Vec3& rotation
 }
 
 Mesh graphics::rotateMesh(const Mesh& mesh, const Vec3& rotation) {
-	std::vector<Triangle> rotated(mesh.getFaces().size());
 	const std::vector<Triangle>& faces = mesh.getFaces();
-	for (int i = 0; i < mesh.getFaces().size(); ++i) {
+	const int size = faces.size();
+	std::vector<Triangle> rotated(size);
+	for (int i = 0; i < size; ++i) {
 		rotated[i] = graphics::rotateTriangle(faces[i], rotation);
 	}
 	return Mesh(rotated);
@@ -55,9 +56,10 @@ Triangle graphics::translateTriangle(const Triangle& triangle, const Vec3& offse
 }
 
 Mesh graphics::translateMesh(const Mesh& mesh, const Vec3& offset) {
-	std::vector<Triangle> translated(mesh.getFaces().size());
 	const std::vector<Triangle>& faces = mesh.getFaces();
-	for (int i = 0; i < mesh.getFaces().size(); ++i) {
+	const int size = faces.size();
+	std::vector<Triangle> translated(size);
+	for (int i = 0; i < size; ++i) {
 		translated[i] = graphics::translateTriangle(faces[i], offset);
 	}
 	return Mesh(translated);
