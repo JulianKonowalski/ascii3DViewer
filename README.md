@@ -23,10 +23,10 @@ All transforms, rotations and functions related to drawing are contained in the 
 For now, the model is loaded into an std::vector, which as many may know is not a good idea from a performance standpoint. I'd suggest scanning the .obj file twice - once to determine the amount of vertices, normals and faces to preallocate needed memory, and the second time to load the data. There may also be a different solution even more efficient than that.
 
 ## Support for quads
-While loading the mesh the program expects it to be made out **FULLY** out of **triangles**, which is a bit of a pain. I'd suggest adding a triangulation functionality while loading the model, which shouldn't be that difficult.
+While loading the mesh the program expects it to be made **FULLY** out of **triangles**, which is a bit of a pain. I'd suggest adding a triangulation functionality while loading the model, which shouldn't be that difficult.
 
 ## Ability to invert normals if needed
-Fortunately, all Blender exports can be loaded without even taking a look at the normals. If loaded in the right order, vertices will always construct a triangle with the normal facing the right way. This may not be the case with all 3D programs or .obj files, so beware.
+Fortunately, all Blender exports can be loaded without even looking at the normals. If loaded in the right order, vertices will always construct a triangle with the normal facing the right way. This may not be the case with all 3D programs or .obj files, so beware.
 
 ## Faster line drawing algorithm
 The program uses **Bresenham's line algorithm**, which is fast but not the fastest. The effects of this optimisation won't be noticeable with smaller models but with the included 350Z model, which has almost 2 million triangles, a 10-15% improvement is a lot. I'd suggest using EFLA for the best performance.
@@ -35,6 +35,6 @@ The program uses **Bresenham's line algorithm**, which is fast but not the faste
 Another weak point is triangle rasterisation, more specifically, determining which points are a part of the rasterised triangle and must be shaded. Currently, I'm creating a bounding box around the projected triangle and scanning every line of the box to determine if the point should be shaded or not. It's okay for most triangles, but as the triangle gets wider and shorter (or the resolution is set higher), unnecessary checks increase dramatically.
 
 # Included assets
--Cube exported from Blender
--Suzanne exported from Blender
--[Nissan 350Z](https://www.turbosquid.com/3d-models/nissan-350z-japanese-sports-coupe-with-interior-model-3d-model-2049724) made by [Bbenedict_](https://www.turbosquid.com/Search/Artists/Bbenedict_)
+*Cube exported from Blender
+*Suzanne exported from Blender
+*[Nissan 350Z](https://www.turbosquid.com/3d-models/nissan-350z-japanese-sports-coupe-with-interior-model-3d-model-2049724) made by [Bbenedict_](https://www.turbosquid.com/Search/Artists/Bbenedict_)
