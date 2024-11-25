@@ -4,6 +4,8 @@ The aim of this project was to show that something like this is possible rather 
 
 The project was inspired by the [ASCII donut](https://www.a1k0n.net/2006/09/15/obfuscated-c-donut.html), but after completing it I realised that [autopawn](https://github.com/autopawn) made something [similar](https://github.com/autopawn/3d-ascii-viewer), but in C with additional mesh colouring features.
 
+[Program Screenshot](screenshot.png)
+
 # Usage
 Everything is set up in the main function. You can specify the location of the file to be loaded and set the transformation and rotation vectors there. The rendering loop won't change, so it is fairly straightforward.
 
