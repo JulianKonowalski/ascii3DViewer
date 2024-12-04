@@ -40,6 +40,7 @@ int main(void) {
 	}
 
 	delete mesh;
+	delete zBuffer;
 
 	return 0;
 }
